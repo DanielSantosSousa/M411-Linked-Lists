@@ -33,3 +33,8 @@
 /M411-Linked-Lists.vcxproj
 /M411-Linked-Lists.vcxproj.filters
 /M411-Linked-Lists.vcxproj.user
+
+# CLion and CMake stuff
+/.idea/
+/cmake-build-debug/
+CMakeLists.txt
