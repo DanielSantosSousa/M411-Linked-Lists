@@ -1,21 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct Elm {
-    int Nr;
-    struct Elm *pNext;
-} struElm;
+typedef struct Node {
+  struct Elm* pNext;
+  struct Data* pData;
+} listNode;
 
-struElm *CreateList(int Anzahl) {
-  struElm *pNew = NULL;
-  struElm *pFirst = NULL;
-  struElm *pLast = NULL;
+typedef struct Data {
+  char Bez[50];
+  double Preis;
+} struDataElm;
+
+
+listNode*CreateList(int Anzahl) {
+  listNode *pNew = NULL;
+  listNode *pFirst = NULL;
+  listNode *pLast = NULL;
   for (int iElm = 0; iElm < Anzahl; iElm++) {
     // Element erstellen und initialisieren
-    pNew = (struElm *) malloc(sizeof(struElm));
+    pNew = (listNode*) malloc(sizeof(listNode));
     if (pNew == NULL) exit(-1);
-    pNew->Nr = iElm + 1;
     pNew->pNext = NULL;
+    pNew->pData = (struDataElm*)malloc(sizeof(struDataElm));
     // Neues Element an Liste anf�gen
     if (pFirst == NULL) pFirst = pNew;
     if (pLast != NULL) pLast->pNext = pNew;
@@ -24,18 +30,17 @@ struElm *CreateList(int Anzahl) {
   return pFirst;
 }
 
-void OutputList(struElm *pFirst) {
-  for (struElm *pElm = pFirst; pElm != NULL; pElm = pElm->pNext)
-    printf("Nr=%i\n", pElm->Nr);
+void OutputList(listNode*pFirst) {
+  for (listNode*pElm = pFirst; pElm != NULL; pElm = pElm->pNext)
+    printf("Nr=%i\n", &(pElm->pData)->Bez);
 }
 
 int main() {
-  struElm *pStart = NULL;
+  listNode *pStart = NULL;
   int AnzahlElm = 10;
   // Liste erstellen
   pStart = CreateList(AnzahlElm);
   // Ausgabe
   OutputList(pStart);
-  system("pause");
   return 0;
 }
