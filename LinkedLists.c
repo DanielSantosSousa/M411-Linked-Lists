@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h> 
+#include <stdbool.h>
+#include <time.h>
 
 #define RAND_MAX = 32767
 
@@ -14,12 +15,27 @@ typedef struct Data {
   double Preis;
 } struDataElm;
 
-listNode*CreateList(int Anzahl) {
+listNode* createList(int);
+listNode* sortList(listNode*, bool);
+void outputList(listNode*);
+
+int main() {
+  listNode *pStart = NULL;
+  int AnzahlElm = 6;
+  // Liste erstellen
+  pStart = createList(AnzahlElm);
+  pStart = sortList(pStart, false);
+  // Ausgabe
+  outputList(pStart);
+  return 0;
+}
+
+listNode*createList(int anzahl) {
   srand((unsigned)time(NULL));
   listNode *pNew = NULL;
   listNode *pFirst = NULL;
   listNode *pLast = NULL;
-  for (int iElm = 0; iElm < Anzahl; iElm++) {
+  for (int iElm = 0; iElm < anzahl; iElm++) {
     // Element erstellen und initialisieren
     pNew = (listNode*) malloc(sizeof(listNode));
     if (pNew == NULL) exit(-1);
@@ -34,7 +50,7 @@ listNode*CreateList(int Anzahl) {
   return pFirst;
 }
 
-listNode* SortList(listNode* firstNode, bool ascending) {
+listNode* sortList(listNode* firstNode, bool ascending) {
   listNode* previousNode = NULL;
   listNode* currentNode = firstNode;
   do {
@@ -59,18 +75,7 @@ listNode* SortList(listNode* firstNode, bool ascending) {
   return firstNode;
 }
 
-void OutputList(listNode*pFirst) {
+void outputList(listNode*pFirst) {
   for (listNode*pElm = pFirst; pElm != NULL; pElm = pElm->pNext)
     printf("Preis=%lf\n", pElm->pData->Preis);
-}
-
-int main() {
-  listNode *pStart = NULL;
-  int AnzahlElm = 4;
-  // Liste erstellen
-  pStart = CreateList(AnzahlElm);
-  pStart = SortList(pStart, true);
-  // Ausgabe
-  OutputList(pStart);
-  return 0;
 }
