@@ -6,42 +6,44 @@
 #define RAND_MAX = 32767
 
 typedef struct Node {
-  struct Node* pNext;
-  struct Data* pData;
-} listNode;
+    struct Node *pNext;
+    struct Data *pArticle;
+} ListNode;
 
 typedef struct Data {
-  char Bez[50];
-  double Preis;
-} struDataElm;
+    char name[50];
+    double price;
+} Article;
 
-listNode* createList(int);
-listNode* sortList(listNode*, bool);
-void outputList(listNode*);
+ListNode *createList(int);
+
+ListNode *sortList(ListNode *, bool);
+
+void outputList(ListNode *);
 
 int main() {
-  listNode *pStart = NULL;
-  int AnzahlElm = 6;
+  ListNode *pStart = NULL;
+  int nItems = 6;
   // Liste erstellen
-  pStart = createList(AnzahlElm);
+  pStart = createList(nItems);
   pStart = sortList(pStart, false);
   // Ausgabe
   outputList(pStart);
   return 0;
 }
 
-listNode*createList(int anzahl) {
-  srand((unsigned)time(NULL));
-  listNode *pNew = NULL;
-  listNode *pFirst = NULL;
-  listNode *pLast = NULL;
-  for (int iElm = 0; iElm < anzahl; iElm++) {
+ListNode *createList(int anzahl) {
+  srand((unsigned) time(NULL));
+  ListNode *pNew = NULL;
+  ListNode *pFirst = NULL;
+  ListNode *pLast = NULL;
+  for (int i = 0; i < anzahl; i++) {
     // Element erstellen und initialisieren
-    pNew = (listNode*) malloc(sizeof(listNode));
+    pNew = (ListNode *) malloc(sizeof(ListNode));
     if (pNew == NULL) exit(-1);
     pNew->pNext = NULL;
-    pNew->pData = (struDataElm*)malloc(sizeof(struDataElm));
-    pNew->pData->Preis = rand() % 100;
+    pNew->pArticle = (Article *) malloc(sizeof(Article));
+    pNew->pArticle->price = rand() % 100;
     // Neues Element an Liste anf�gen
     if (pFirst == NULL) pFirst = pNew;
     if (pLast != NULL) pLast->pNext = pNew;
@@ -50,32 +52,32 @@ listNode*createList(int anzahl) {
   return pFirst;
 }
 
-listNode* sortList(listNode* firstNode, bool ascending) {
-  listNode* previousNode = NULL;
-  listNode* currentNode = firstNode;
+ListNode *sortList(ListNode *pFirstNode, bool ascending) {
+  ListNode *pPreviousNode = NULL;
+  ListNode *pCurrentNode = pFirstNode;
   do {
-    double currentPrice = currentNode->pData->Preis;
-    double nextPrice = currentNode->pNext->pData->Preis;
+    double currentPrice = pCurrentNode->pArticle->price;
+    double nextPrice = pCurrentNode->pNext->pArticle->price;
     if ((currentPrice > nextPrice && ascending) || currentPrice < nextPrice && !ascending) {
-      if (previousNode != NULL) {
-        previousNode->pNext = currentNode->pNext;
+      if (pPreviousNode != NULL) {
+        pPreviousNode->pNext = pCurrentNode->pNext;
       } else {
-        firstNode = currentNode->pNext;
+        pFirstNode = pCurrentNode->pNext;
       }
-      listNode* temp = currentNode->pNext->pNext;
-      currentNode->pNext->pNext = currentNode;
-      currentNode->pNext = temp;
-      currentNode = firstNode;
-      previousNode = NULL;
+      ListNode *temp = pCurrentNode->pNext->pNext;
+      pCurrentNode->pNext->pNext = pCurrentNode;
+      pCurrentNode->pNext = temp;
+      pCurrentNode = pFirstNode;
+      pPreviousNode = NULL;
     } else {
-      previousNode = currentNode;
-      currentNode = currentNode->pNext;
+      pPreviousNode = pCurrentNode;
+      pCurrentNode = pCurrentNode->pNext;
     }
-  } while (currentNode->pNext != NULL);
-  return firstNode;
+  } while (pCurrentNode->pNext != NULL);
+  return pFirstNode;
 }
 
-void outputList(listNode*pFirst) {
-  for (listNode*pElm = pFirst; pElm != NULL; pElm = pElm->pNext)
-    printf("Preis=%lf\n", pElm->pData->Preis);
+void outputList(ListNode *pFirst) {
+  for (ListNode *p = pFirst; p != NULL; p = p->pNext)
+    printf("price=%lf\n", p->pArticle->price);
 }
