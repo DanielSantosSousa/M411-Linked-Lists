@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdbool.h> 
 
+#define RAND_MAX = 32767
+
 typedef struct Node {
   struct Node* pNext;
   struct Data* pData;
@@ -13,6 +15,7 @@ typedef struct Data {
 } struDataElm;
 
 listNode*CreateList(int Anzahl) {
+  srand((unsigned)time(NULL));
   listNode *pNew = NULL;
   listNode *pFirst = NULL;
   listNode *pLast = NULL;
@@ -22,6 +25,7 @@ listNode*CreateList(int Anzahl) {
     if (pNew == NULL) exit(-1);
     pNew->pNext = NULL;
     pNew->pData = (struDataElm*)malloc(sizeof(struDataElm));
+    pNew->pData->Preis = rand() % 100;
     // Neues Element an Liste anf�gen
     if (pFirst == NULL) pFirst = pNew;
     if (pLast != NULL) pLast->pNext = pNew;
@@ -30,22 +34,13 @@ listNode*CreateList(int Anzahl) {
   return pFirst;
 }
 
-listNode* GetLastNode(listNode* firstNode) {
-  listNode* currentNode = firstNode;
-   while (currentNode->pNext != NULL) {
-     currentNode = currentNode->pNext;
-   }
-  return currentNode;
-}
-
-listNode* SortList(listNode* firstNode, bool ascendant) {
+listNode* SortList(listNode* firstNode, bool ascending) {
   listNode* previousNode = NULL;
   listNode* currentNode = firstNode;
-  listNode* lastNode = GetLastNode(firstNode);
   do {
     double currentPrice = currentNode->pData->Preis;
     double nextPrice = currentNode->pNext->pData->Preis;
-    if ((currentPrice > nextPrice && ascendant) || currentPrice < nextPrice) {
+    if ((currentPrice > nextPrice && ascending) || currentPrice < nextPrice && !ascending) {
       if (previousNode != NULL) {
         previousNode->pNext = currentNode->pNext;
       } else {
@@ -55,21 +50,26 @@ listNode* SortList(listNode* firstNode, bool ascendant) {
       currentNode->pNext->pNext = currentNode;
       currentNode->pNext = temp;
       currentNode = firstNode;
+      previousNode = NULL;
+    } else {
+      previousNode = currentNode;
+      currentNode = currentNode->pNext;
     }
-  } while (currentNode != lastNode);
+  } while (currentNode->pNext != NULL);
   return firstNode;
 }
 
 void OutputList(listNode*pFirst) {
   for (listNode*pElm = pFirst; pElm != NULL; pElm = pElm->pNext)
-    printf("Nr=%i\n", &(pElm->pData)->Bez);
+    printf("Preis=%lf\n", pElm->pData->Preis);
 }
 
 int main() {
   listNode *pStart = NULL;
-  int AnzahlElm = 10;
+  int AnzahlElm = 4;
   // Liste erstellen
   pStart = CreateList(AnzahlElm);
+  pStart = SortList(pStart, true);
   // Ausgabe
   OutputList(pStart);
   return 0;
