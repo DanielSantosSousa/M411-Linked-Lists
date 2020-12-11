@@ -46,14 +46,18 @@ listNode* SortList(listNode* firstNode, bool ascendant) {
     double currentPrice = currentNode->pData->Preis;
     double nextPrice = currentNode->pNext->pData->Preis;
     if ((currentPrice > nextPrice && ascendant) || currentPrice < nextPrice) {
-      if (previousNode != NULL)
+      if (previousNode != NULL) {
         previousNode->pNext = currentNode->pNext;
+      } else {
+        firstNode = currentNode->pNext;
+      }
       listNode* temp = currentNode->pNext->pNext;
       currentNode->pNext->pNext = currentNode;
       currentNode->pNext = temp;
       currentNode = firstNode;
     }
   } while (currentNode != lastNode);
+  return firstNode;
 }
 
 void OutputList(listNode*pFirst) {
