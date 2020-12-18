@@ -2,8 +2,18 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+#include <string.h>
 
 #define RAND_MAX = 32767
+#ifdef __linux__
+#define strcpy_s strcpy;
+#endif
+
+const int N_COMMANDS = 5;
+
+const char *COMMANDS[] = {
+        "create", "sort", "print", "delete", "exit"
+};
 
 typedef struct Node {
     struct Node *pNext;
@@ -21,15 +31,93 @@ ListNode *sortList(ListNode *, bool);
 
 void outputList(ListNode *);
 
+void printIntro();
+
+void getInput(char *, int);
+
+ListNode *executeCommand(ListNode *, char);
+
+ListNode *execListCreationWizard();
+
+ListNode *execListSortingWizard(ListNode *);
+
 int main() {
-  ListNode *pStart = NULL;
-  int nItems = 6;
-  // Liste erstellen
-  pStart = createList(nItems);
-  pStart = sortList(pStart, false);
-  // Ausgabe
-  outputList(pStart);
+  ListNode *list;
+  // create list with elements
+  // delete list
+  // sort list (DESC/ASC)
+  // print list
+  // exit
+  char text[50];
+  do {
+    printIntro();
+    getInput(text, sizeof(text));
+    list = executeCommand(list, text[0]);
+  } while (list != 0);
+
+  outputList(list);
   return 0;
+}
+
+void printIntro() {
+  printf("What would you like to do?\n");
+  for (int i = 0; i < N_COMMANDS; i++) {
+    printf("%d\t%s\n", i, COMMANDS[i]);
+  }
+}
+
+void getInput(char *text, int size) {
+  fgets(text, size, stdin);
+  for (int i = strlen(text) - 1; text[i] == '\n'; i--) text[i] = '\0';
+}
+
+ListNode *executeCommand(ListNode *list, char input) {
+
+  switch (input) {
+    case '0':
+      list = execListCreationWizard();
+      break;
+    case '1':
+      list = execListSortingWizard(list);
+      break;
+    case '2':
+      outputList(list);
+      break;
+    case '3':
+      //TODO: deleting
+    case '4':
+    default:
+      return 0;
+  }
+
+  return list;
+}
+
+ListNode *execListSortingWizard(ListNode *list) {
+  printf("List sorting. Please input\n0\tfor ascending\n1\tfor descending\n");
+  char text[100];
+  getInput(text, sizeof(text));
+  bool ascending = text[0] == '0' ? true : false;
+  sortList(list, ascending);
+
+  return list;
+}
+
+ListNode *execListCreationWizard() {
+  ListNode *list;
+
+  printf("List creation. Please input the desired number of items:\n");
+  char text[100];
+  getInput(text, sizeof(text));
+  int nItems = atoi(text);
+
+  if (nItems <= 0) {
+    printf("Input invalid. Please enter a number bigger than 0.\n");
+  } else {
+    list = createList(nItems);
+  }
+
+  return list;
 }
 
 ListNode *createList(int anzahl) {
