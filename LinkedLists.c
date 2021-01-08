@@ -37,7 +37,7 @@ void getInput(char *, int);
 
 ListNode *executeCommand(ListNode *, char);
 
-ListNode *execListCreationWizard();
+ListNode *execListCreationWizard(ListNode *);
 
 ListNode *execListSortingWizard(ListNode *);
 
@@ -83,7 +83,7 @@ int countElements(ListNode *firstNode) {
 ListNode *executeCommand(ListNode *list, char input) {
   switch (input) {
     case '0':
-      list = execListCreationWizard();
+      list = execListCreationWizard(list);
       break;
     case '1':
       list = execListSortingWizard(list);
@@ -113,7 +113,11 @@ ListNode *execListSortingWizard(ListNode *list) {
   return list;
 }
 
-ListNode *execListCreationWizard() {
+ListNode *execListCreationWizard(ListNode *currList) {
+  if (currList != NULL) {
+    printf("There exists a list already!\n");
+    deleteList(currList);
+  }
   ListNode *list = NULL;
 
   printf("List creation. Please input the desired number of items:\n");
@@ -197,12 +201,12 @@ void outputList(ListNode *pFirst) {
     printf("Name: %s\nPrice=%lf\n\n", p->pArticle->name, p->pArticle->price);
 }
 
-void deleteList(ListNode *firstNode){
-  printf("List will be deleted.");
+void deleteList(ListNode *firstNode) {
+  printf("The list will be deleted...\n");
   ListNode *pCurr = firstNode;
   ListNode *pNext = firstNode->pNext;
 
-  while(pNext != NULL){
+  while (pNext != NULL) {
     free(pCurr->pArticle);
     free(pCurr);
     pCurr = pNext;
