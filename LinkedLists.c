@@ -47,6 +47,7 @@ void deleteList(ListNode *);
 
 bool checkIfListEmpty(ListNode *);
 
+// Alex K.
 int main() {
   ListNode *list = NULL;
   char text[50];
@@ -58,6 +59,7 @@ int main() {
   return 0;
 }
 
+// Alex K.
 void printIntro() {
   printf("What would you like to do?\n");
   for (int i = 0; i < N_COMMANDS; i++) {
@@ -65,11 +67,14 @@ void printIntro() {
   }
 }
 
+// Peter Kaufmann
+// This method exists only because of the lack of a scanf/scanf_s under Linux
 void getInput(char *text, int size) {
   fgets(text, size, stdin);
   for (int i = strlen(text) - 1; text[i] == '\n'; i--) text[i] = '\0';
 }
 
+// Alex K.
 int countElements(ListNode *firstNode) {
   int count = 1;
   ListNode *cNode = firstNode;
@@ -82,6 +87,7 @@ int countElements(ListNode *firstNode) {
   return count;
 }
 
+// Alex K.
 ListNode *executeCommand(ListNode *list, char input) {
   switch (input) {
     case '0':
@@ -109,6 +115,7 @@ ListNode *executeCommand(ListNode *list, char input) {
   return list;
 }
 
+// Alex K.
 ListNode *execListSortingWizard(ListNode *list) {
   printf("List sorting. Please input\n0\tfor ascending\n1\tfor descending\n");
   char text[100];
@@ -119,6 +126,7 @@ ListNode *execListSortingWizard(ListNode *list) {
   return list;
 }
 
+// Alex K.
 ListNode *execListCreationWizard(ListNode *currList) {
   if (currList != NULL) {
     printf("There exists a list already!\n");
@@ -140,12 +148,14 @@ ListNode *execListCreationWizard(ListNode *currList) {
   return list;
 }
 
+// Daniel S. S.
 char generateRandomChar() {
   char fromChar = 'A';
   char toChar = 'Z';
   return (rand() % (toChar - fromChar)) + fromChar;
 }
 
+// Daniel S. S.
 void generateArticleName(char *name) {
   *name = generateRandomChar();
   *(++name) = generateRandomChar();
@@ -153,6 +163,7 @@ void generateArticleName(char *name) {
   *(++name) = '\0';
 }
 
+// Daniel S.S
 ListNode *createList(int anzahl) {
   srand((unsigned) time(NULL));
   ListNode *pNew = NULL;
@@ -176,6 +187,8 @@ ListNode *createList(int anzahl) {
   return pFirst;
 }
 
+// Daniel S. S.
+// Alex K. (only renaming variables)
 ListNode *sortList(ListNode *pFirstNode, bool ascending) {
   ListNode *pPreviousNode = NULL;
   ListNode *pCurrentNode = pFirstNode;
@@ -201,12 +214,14 @@ ListNode *sortList(ListNode *pFirstNode, bool ascending) {
   return pFirstNode;
 }
 
+// Alex K. & Daniel S. S.
 void outputList(ListNode *pFirst) {
   printf("The list contains %d elements\n", countElements(pFirst));
   for (ListNode *p = pFirst; p != NULL; p = p->pNext)
     printf("Name: %s\nPrice=%lf\n\n", p->pArticle->name, p->pArticle->price);
 }
 
+// Alex K.
 void deleteList(ListNode *firstNode) {
   printf("The list will be deleted...\n");
   ListNode *pCurr = firstNode;
@@ -222,6 +237,7 @@ void deleteList(ListNode *firstNode) {
   free(pCurr);
 }
 
+// Alex K.
 bool checkIfListEmpty(ListNode *firstNode) {
   if (firstNode == NULL) {
     printf("No list exists! Create a list first.\n");
