@@ -41,7 +41,9 @@ ListNode *execListCreationWizard();
 
 ListNode *execListSortingWizard(ListNode *);
 
-int countElements(ListNode *firstNode);
+int countElements(ListNode *);
+
+void deleteList(ListNode *);
 
 int main() {
   ListNode *list = NULL;
@@ -51,8 +53,6 @@ int main() {
     getInput(text, sizeof(text));
     list = executeCommand(list, text[0]);
   } while (list != 0);
-
-  outputList(list);
   return 0;
 }
 
@@ -92,9 +92,11 @@ ListNode *executeCommand(ListNode *list, char input) {
       outputList(list);
       break;
     case '3':
-      //TODO: deleting
+      deleteList(list);
+      break;
     case '4':
     default:
+      deleteList(list);
       return 0;
   }
 
@@ -148,7 +150,7 @@ ListNode* createList(int anzahl) {
   ListNode* pLast = NULL;
   for (int i = 0; i < anzahl; i++) {
     // Element erstellen und initialisieren
-    pNew = (ListNode*)malloc(sizeof(ListNode));
+    pNew = (ListNode *) malloc(sizeof(ListNode));
     if (pNew == NULL) exit(-1);
     pNew->pNext = NULL;
     pNew->pArticle = (Article*)malloc(sizeof(Article));
@@ -190,7 +192,22 @@ ListNode *sortList(ListNode *pFirstNode, bool ascending) {
 }
 
 void outputList(ListNode *pFirst) {
-  printf("The list contains %d elemetns\n", countElements(pFirst));
+  printf("The list contains %d elements\n", countElements(pFirst));
   for (ListNode *p = pFirst; p != NULL; p = p->pNext)
     printf("Name: %s\nPrice=%lf\n\n", p->pArticle->name, p->pArticle->price);
+}
+
+void deleteList(ListNode *firstNode){
+  printf("List will be deleted.");
+  ListNode *pCurr = firstNode;
+  ListNode *pNext = firstNode->pNext;
+
+  while(pNext != NULL){
+    free(pCurr->pArticle);
+    free(pCurr);
+    pCurr = pNext;
+    pNext = pNext->pNext;
+  }
+  free(pCurr->pArticle);
+  free(pCurr);
 }
