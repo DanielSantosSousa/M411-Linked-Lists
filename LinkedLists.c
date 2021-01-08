@@ -9,10 +9,10 @@
 #define strcpy_s strcpy;
 #endif
 
-const int N_COMMANDS = 5;
+const int N_COMMANDS = 4;
 
 const char *COMMANDS[] = {
-        "create", "sort", "print", "delete", "exit"
+        "create", "sort", "print", "exit"
 };
 
 typedef struct Node {
@@ -45,6 +45,8 @@ int countElements(ListNode *);
 
 void deleteList(ListNode *);
 
+bool checkIfListEmpty(ListNode *);
+
 int main() {
   ListNode *list = NULL;
   char text[50];
@@ -52,7 +54,7 @@ int main() {
     printIntro();
     getInput(text, sizeof(text));
     list = executeCommand(list, text[0]);
-  } while (list != 0);
+  } while (list != 1);
   return 0;
 }
 
@@ -86,18 +88,22 @@ ListNode *executeCommand(ListNode *list, char input) {
       list = execListCreationWizard(list);
       break;
     case '1':
-      list = execListSortingWizard(list);
+      if (!checkIfListEmpty(list)) {
+        list = execListSortingWizard(list);
+      }
       break;
     case '2':
-      outputList(list);
+      if (!checkIfListEmpty(list)) {
+        outputList(list);
+      }
       break;
-    case '3':
-      deleteList(list);
-      break;
-    case '4':
     default:
-      deleteList(list);
-      return 0;
+      if (checkIfListEmpty(list)) {
+        return 1;
+      } else {
+        deleteList(list);
+        return 1;
+      }
   }
 
   return list;
@@ -140,24 +146,24 @@ char generateRandomChar() {
   return (rand() % (toChar - fromChar)) + fromChar;
 }
 
-void generateArticleName(char* name) {
+void generateArticleName(char *name) {
   *name = generateRandomChar();
   *(++name) = generateRandomChar();
   *(++name) = generateRandomChar();
   *(++name) = '\0';
 }
 
-ListNode* createList(int anzahl) {
-  srand((unsigned)time(NULL));
-  ListNode* pNew = NULL;
-  ListNode* pFirst = NULL;
-  ListNode* pLast = NULL;
+ListNode *createList(int anzahl) {
+  srand((unsigned) time(NULL));
+  ListNode *pNew = NULL;
+  ListNode *pFirst = NULL;
+  ListNode *pLast = NULL;
   for (int i = 0; i < anzahl; i++) {
     // Element erstellen und initialisieren
     pNew = (ListNode *) malloc(sizeof(ListNode));
     if (pNew == NULL) exit(-1);
     pNew->pNext = NULL;
-    pNew->pArticle = (Article*)malloc(sizeof(Article));
+    pNew->pArticle = (Article *) malloc(sizeof(Article));
     generateArticleName(pNew->pArticle->name);
     if (pNew->pArticle) {
       pNew->pArticle->price = rand() % 100;
@@ -214,4 +220,13 @@ void deleteList(ListNode *firstNode) {
   }
   free(pCurr->pArticle);
   free(pCurr);
+}
+
+bool checkIfListEmpty(ListNode *firstNode) {
+  if (firstNode == NULL) {
+    printf("No list exists! Create a list first.\n");
+    return true;
+  } else {
+    return false;
+  }
 }
