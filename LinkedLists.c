@@ -41,13 +41,10 @@ ListNode *execListCreationWizard();
 
 ListNode *execListSortingWizard(ListNode *);
 
+int countElements(ListNode *firstNode);
+
 int main() {
-  ListNode *list;
-  // create list with elements
-  // delete list
-  // sort list (DESC/ASC)
-  // print list
-  // exit
+  ListNode *list = NULL;
   char text[50];
   do {
     printIntro();
@@ -71,8 +68,19 @@ void getInput(char *text, int size) {
   for (int i = strlen(text) - 1; text[i] == '\n'; i--) text[i] = '\0';
 }
 
-ListNode *executeCommand(ListNode *list, char input) {
+int countElements(ListNode *firstNode) {
+  int count = 1;
+  ListNode *cNode = firstNode;
+  if (firstNode != NULL) {
+    while (cNode->pNext != NULL) {
+      count++;
+      cNode = cNode->pNext;
+    }
+  }
+  return count;
+}
 
+ListNode *executeCommand(ListNode *list, char input) {
   switch (input) {
     case '0':
       list = execListCreationWizard();
@@ -98,13 +106,13 @@ ListNode *execListSortingWizard(ListNode *list) {
   char text[100];
   getInput(text, sizeof(text));
   bool ascending = text[0] == '0' ? true : false;
-  sortList(list, ascending);
+  list = sortList(list, ascending);
 
   return list;
 }
 
 ListNode *execListCreationWizard() {
-  ListNode *list;
+  ListNode *list = NULL;
 
   printf("List creation. Please input the desired number of items:\n");
   char text[100];
@@ -166,6 +174,7 @@ ListNode *sortList(ListNode *pFirstNode, bool ascending) {
 }
 
 void outputList(ListNode *pFirst) {
+  printf("The list contains %d elemetns\n", countElements(pFirst));
   for (ListNode *p = pFirst; p != NULL; p = p->pNext)
     printf("price=%lf\n", p->pArticle->price);
 }
