@@ -128,18 +128,34 @@ ListNode *execListCreationWizard() {
   return list;
 }
 
-ListNode *createList(int anzahl) {
-  srand((unsigned) time(NULL));
-  ListNode *pNew = NULL;
-  ListNode *pFirst = NULL;
-  ListNode *pLast = NULL;
+char generateRandomChar() {
+  char fromChar = 'A';
+  char toChar = 'Z';
+  return (rand() % (toChar - fromChar)) + fromChar;
+}
+
+void generateArticleName(char* name) {
+  *name = generateRandomChar();
+  *(++name) = generateRandomChar();
+  *(++name) = generateRandomChar();
+  *(++name) = '\0';
+}
+
+ListNode* createList(int anzahl) {
+  srand((unsigned)time(NULL));
+  ListNode* pNew = NULL;
+  ListNode* pFirst = NULL;
+  ListNode* pLast = NULL;
   for (int i = 0; i < anzahl; i++) {
     // Element erstellen und initialisieren
-    pNew = (ListNode *) malloc(sizeof(ListNode));
+    pNew = (ListNode*)malloc(sizeof(ListNode));
     if (pNew == NULL) exit(-1);
     pNew->pNext = NULL;
-    pNew->pArticle = (Article *) malloc(sizeof(Article));
-    pNew->pArticle->price = rand() % 100;
+    pNew->pArticle = (Article*)malloc(sizeof(Article));
+    generateArticleName(pNew->pArticle->name);
+    if (pNew->pArticle) {
+      pNew->pArticle->price = rand() % 100;
+    }
     // Neues Element an Liste anf�gen
     if (pFirst == NULL) pFirst = pNew;
     if (pLast != NULL) pLast->pNext = pNew;
@@ -176,5 +192,5 @@ ListNode *sortList(ListNode *pFirstNode, bool ascending) {
 void outputList(ListNode *pFirst) {
   printf("The list contains %d elemetns\n", countElements(pFirst));
   for (ListNode *p = pFirst; p != NULL; p = p->pNext)
-    printf("price=%lf\n", p->pArticle->price);
+    printf("Name: %s\nPrice=%lf\n\n", p->pArticle->name, p->pArticle->price);
 }
