@@ -55,7 +55,7 @@ int main() {
     printIntro();
     getInput(text, sizeof(text));
     list = executeCommand(list, text[0]);
-  } while (list != 1);
+  } while (list != NULL);
   return 0;
 }
 
@@ -72,19 +72,6 @@ void printIntro() {
 void getInput(char *text, int size) {
   fgets(text, size, stdin);
   for (int i = strlen(text) - 1; text[i] == '\n'; i--) text[i] = '\0';
-}
-
-// Alex K.
-int countElements(ListNode *firstNode) {
-  int count = 1;
-  ListNode *cNode = firstNode;
-  if (firstNode != NULL) {
-    while (cNode->pNext != NULL) {
-      count++;
-      cNode = cNode->pNext;
-    }
-  }
-  return count;
 }
 
 // Alex K.
@@ -105,14 +92,128 @@ ListNode *executeCommand(ListNode *list, char input) {
       break;
     default:
       if (checkIfListEmpty(list)) {
-        return 1;
+        return NULL;
       } else {
         deleteList(list);
-        return 1;
+        return NULL;
       }
   }
 
   return list;
+}
+
+/* Function to calculate length of linked list */
+int length(ListNode *current) {
+  int count = 0;
+  while (current != NULL) {
+    current = current->pNext;
+    count++;
+  }
+  return count;
+}
+
+/* Merge function of Merge Sort to Merge the two sorted parts
+   of the Linked List. We compare the next value of start1 and
+   current value of start2 and insert start2 after start1 if
+   it's smaller than next value of start1. We do this until
+   start1 or start2 end. If start1 ends, then we assign next
+   of start1 to start2 because start2 may have some elements
+   left out which are greater than the last value of start1.
+   If start2 ends then we assign end2 to end1. This is necessary
+   because we use end2 in another function (mergeSort function)
+   to determine the next start1 (i.e) start1 for next
+   iteration = end2->next */
+void merge(ListNode **start1, ListNode **end1,
+           ListNode **start2, ListNode **end2) {
+  // Making sure that first node of second
+  // list is higher.
+  ListNode *temp = NULL;
+  if ((*start1)->pArticle->price > (*start2)->pArticle->price) {
+    ListNode *temp = *start1;
+    *start1 = *start2;
+    *start2 = temp;
+    temp = *end1;
+    *end1 = *end2;
+    *end2 = temp;
+  }
+  // Merging remaining nodes
+  ListNode *astart = *start1, *aend = *end1;
+  ListNode *bstart = *start2, *bend = *end2;
+  ListNode *bendnext = (*end2)->pNext;
+  while (astart != aend && bstart != bendnext) {
+    if (astart->pNext->pArticle->price > bstart->pArticle->price) {
+      temp = bstart->pNext;
+      bstart->pNext = astart->pNext;
+      astart->pNext = bstart;
+      bstart = temp;
+    }
+    astart = astart->pNext;
+  }
+  if (astart == aend)
+    astart->pNext = bstart;
+  else
+    *end2 = *end1;
+}
+
+/* MergeSort of Linked List
+   The gap is initially 1. It is incremented as
+   2, 4, 8, .. until it reaches the length of the
+   linked list. For each gap, the linked list is
+   sorted around the gap.
+   The prevend stores the address of the last node after
+   sorting a part of linked list so that it's next node
+   can be assigned after sorting the succeeding list.
+   temp is used to store the next start1 because after
+   sorting, the last node will be different. So it
+   is necessary to store the address of start1 before
+   sorting. We select the start1, end1, start2, end2 for
+   sorting. start1 - end1 may be considered as a list
+   and start2 - end2 may be considered as another list
+   and we are merging these two sorted list in merge
+   function and assigning the starting address to the
+   previous end address. */
+void mergeSort(ListNode **head) {
+  if (*head == NULL)
+    return;
+  ListNode *start1 = NULL, *end1 = NULL;
+  ListNode *start2 = NULL, *end2 = NULL;
+  ListNode *prevend = NULL;
+  int len = length(*head);
+  for (int gap = 1; gap < len; gap = gap * 2) {
+    start1 = *head;
+    while (start1) {
+      // If this is first iteration
+      bool isFirstIter = 0;
+      if (start1 == *head)
+        isFirstIter = 1;
+      // First part for merging
+      int counter = gap;
+      end1 = start1;
+      while (--counter && end1->pNext)
+        end1 = end1->pNext;
+      // Second part for merging
+      start2 = end1->pNext;
+      if (!start2)
+        break;
+      counter = gap;
+      end2 = start2;
+      while (--counter && end2->pNext)
+        end2 = end2->pNext;
+      // To store for next iteration.
+      ListNode *temp = end2->pNext;
+      // Merging two parts.
+      merge(&start1, &end1, &start2, &end2);
+      // Update head for first iteration, else
+      // append after previous list
+      if (isFirstIter)
+        *head = start1;
+      else
+        prevend->pNext = start1;
+      prevend = end2;
+      start1 = temp;
+    }
+    prevend->pNext = start1;
+  }
 }
 
 // Alex K.
@@ -121,9 +222,9 @@ ListNode *execListSortingWizard(ListNode *list) {
   char text[100];
   getInput(text, sizeof(text));
   bool ascending = text[0] == '0' ? true : false;
-  list = sortList(list, ascending);
-
-  return list;
+  ListNode **headRef = &list;
+  mergeSort(headRef);
+  return *headRef;
 }
 
 // Alex K.
@@ -187,36 +288,9 @@ ListNode *createList(int anzahl) {
   return pFirst;
 }
 
-// Daniel S. S.
-// Alex K. (only renaming variables)
-ListNode *sortList(ListNode *pFirstNode, bool ascending) {
-  ListNode *pPreviousNode = NULL;
-  ListNode *pCurrentNode = pFirstNode;
-  do {
-    double currentPrice = pCurrentNode->pArticle->price;
-    double nextPrice = pCurrentNode->pNext->pArticle->price;
-    if ((currentPrice > nextPrice && ascending) || currentPrice < nextPrice && !ascending) {
-      if (pPreviousNode != NULL) {
-        pPreviousNode->pNext = pCurrentNode->pNext;
-      } else {
-        pFirstNode = pCurrentNode->pNext;
-      }
-      ListNode *temp = pCurrentNode->pNext->pNext;
-      pCurrentNode->pNext->pNext = pCurrentNode;
-      pCurrentNode->pNext = temp;
-      pCurrentNode = pFirstNode;
-      pPreviousNode = NULL;
-    } else {
-      pPreviousNode = pCurrentNode;
-      pCurrentNode = pCurrentNode->pNext;
-    }
-  } while (pCurrentNode->pNext != NULL);
-  return pFirstNode;
-}
-
 // Alex K. & Daniel S. S.
 void outputList(ListNode *pFirst) {
-  printf("The list contains %d elements\n", countElements(pFirst));
+  printf("The list contains %d elements\n", length(pFirst));
   for (ListNode *p = pFirst; p != NULL; p = p->pNext)
     printf("Name: %s\nPrice=%lf\n\n", p->pArticle->name, p->pArticle->price);
 }
