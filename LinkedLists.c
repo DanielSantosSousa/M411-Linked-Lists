@@ -26,26 +26,20 @@ typedef struct Data {
 } Article;
 
 ListNode *createList(int);
-
-ListNode *sortList(ListNode *, bool);
-
-void outputList(ListNode *);
-
-void printIntro();
-
-void getInput(char *, int);
-
 ListNode *executeCommand(ListNode *, char);
-
 ListNode *execListCreationWizard(ListNode *);
-
 ListNode *execListSortingWizard(ListNode *);
-
-int countElements(ListNode *);
-
-void deleteList(ListNode *);
-
 bool checkIfListEmpty(ListNode *);
+int length(ListNode *);
+char generateRandomChar();
+void outputList(ListNode *);
+void printIntro();
+void getInput(char *, int);
+void deleteList(ListNode *);
+void mergeByPrice(ListNode **, ListNode **, ListNode **, ListNode **, bool);
+void mergeByName(ListNode **, ListNode **, ListNode **, ListNode **, bool);
+void mergeSort(ListNode **, bool, bool);
+void generateArticleName(char *);
 
 // Alex K.
 int main() {
@@ -67,7 +61,7 @@ void printIntro() {
   }
 }
 
-// Peter Kaufmann
+// Alex K. with help from Peter Kaufmann
 // This method exists only because of the lack of a scanf/scanf_s under Linux
 void getInput(char *text, int size) {
   fgets(text, size, stdin);
@@ -102,77 +96,138 @@ ListNode *executeCommand(ListNode *list, char input) {
   return list;
 }
 
-/* Function to calculate length of linked list */
-int length(ListNode *current) {
+//Daniel S.S.
+void mergeByName(ListNode **start1, ListNode **end1, ListNode **start2, ListNode **end2, bool ascending) {
+  // Making sure that first node of second
+  // list is higher.
+  ListNode *temp = NULL;
+  if (ascending) {
+    if (strcmp((*start1)->pArticle->name, (*start2)->pArticle->name) > 0) {
+      ListNode *temp = *start1;
+      *start1 = *start2;
+      *start2 = temp;
+      temp = *end1;
+      *end1 = *end2;
+      *end2 = temp;
+    }
+    // Merging remaining nodes
+    ListNode *astart = *start1, *aend = *end1;
+    ListNode *bstart = *start2, *bend = *end2;
+    ListNode *bendnext = (*end2)->pNext;
+    while (astart != aend && bstart != bendnext) {
+      if (strcmp(astart->pNext->pArticle->name, bstart->pArticle->name) > 0) {
+        temp = bstart->pNext;
+        bstart->pNext = astart->pNext;
+        astart->pNext = bstart;
+        bstart = temp;
+      }
+      astart = astart->pNext;
+    }
+    if (astart == aend)
+      astart->pNext = bstart;
+    else
+      *end2 = *end1;
+  } else {
+    if (strcmp((*start1)->pArticle->name, (*start2)->pArticle->name) < 0) {
+      ListNode *temp = *start1;
+      *start1 = *start2;
+      *start2 = temp;
+      temp = *end1;
+      *end1 = *end2;
+      *end2 = temp;
+    }
+    // Merging remaining nodes
+    ListNode *astart = *start1, *aend = *end1;
+    ListNode *bstart = *start2, *bend = *end2;
+    ListNode *bendnext = (*end2)->pNext;
+    while (astart != aend && bstart != bendnext) {
+      if (strcmp(astart->pNext->pArticle->name, bstart->pArticle->name) < 0) {
+        temp = bstart->pNext;
+        bstart->pNext = astart->pNext;
+        astart->pNext = bstart;
+        bstart = temp;
+      }
+      astart = astart->pNext;
+    }
+    if (astart == aend)
+      astart->pNext = bstart;
+    else
+      *end2 = *end1;
+  }
+}
+
+// Alex K.
+int length(ListNode *currNode) {
   int count = 0;
-  while (current != NULL) {
-    current = current->pNext;
+  while (currNode != NULL) {
+    currNode = currNode->pNext;
     count++;
   }
   return count;
 }
 
-/* Merge function of Merge Sort to Merge the two sorted parts
-   of the Linked List. We compare the next value of start1 and
-   current value of start2 and insert start2 after start1 if
-   it's smaller than next value of start1. We do this until
-   start1 or start2 end. If start1 ends, then we assign next
-   of start1 to start2 because start2 may have some elements
-   left out which are greater than the last value of start1.
-   If start2 ends then we assign end2 to end1. This is necessary
-   because we use end2 in another function (mergeSort function)
-   to determine the next start1 (i.e) start1 for next
-   iteration = end2->next */
-void merge(ListNode **start1, ListNode **end1,
-           ListNode **start2, ListNode **end2) {
+//Daniel S.S.
+void mergeByPrice(ListNode **start1, ListNode **end1, ListNode **start2, ListNode **end2, bool ascending) {
   // Making sure that first node of second
   // list is higher.
   ListNode *temp = NULL;
-  if ((*start1)->pArticle->price > (*start2)->pArticle->price) {
-    ListNode *temp = *start1;
-    *start1 = *start2;
-    *start2 = temp;
-    temp = *end1;
-    *end1 = *end2;
-    *end2 = temp;
-  }
-  // Merging remaining nodes
-  ListNode *astart = *start1, *aend = *end1;
-  ListNode *bstart = *start2, *bend = *end2;
-  ListNode *bendnext = (*end2)->pNext;
-  while (astart != aend && bstart != bendnext) {
-    if (astart->pNext->pArticle->price > bstart->pArticle->price) {
-      temp = bstart->pNext;
-      bstart->pNext = astart->pNext;
-      astart->pNext = bstart;
-      bstart = temp;
+  if (ascending) {
+    if ((*start1)->pArticle->price > (*start2)->pArticle->price) {
+      ListNode *temp = *start1;
+      *start1 = *start2;
+      *start2 = temp;
+      temp = *end1;
+      *end1 = *end2;
+      *end2 = temp;
     }
-    astart = astart->pNext;
+    // Merging remaining nodes
+    ListNode *astart = *start1, *aend = *end1;
+    ListNode *bstart = *start2, *bend = *end2;
+    ListNode *bendnext = (*end2)->pNext;
+    while (astart != aend && bstart != bendnext) {
+      if (astart->pNext->pArticle->price > bstart->pArticle->price) {
+        temp = bstart->pNext;
+        bstart->pNext = astart->pNext;
+        astart->pNext = bstart;
+        bstart = temp;
+      }
+      astart = astart->pNext;
+    }
+    if (astart == aend)
+      astart->pNext = bstart;
+    else
+      *end2 = *end1;
+  } else {
+    if ((*start1)->pArticle->price < (*start2)->pArticle->price) {
+      ListNode *temp = *start1;
+      *start1 = *start2;
+      *start2 = temp;
+      temp = *end1;
+      *end1 = *end2;
+      *end2 = temp;
+    }
+    // Merging remaining nodes
+    ListNode *astart = *start1, *aend = *end1;
+    ListNode *bstart = *start2, *bend = *end2;
+    ListNode *bendnext = (*end2)->pNext;
+    while (astart != aend && bstart != bendnext) {
+      if (astart->pNext->pArticle->price < bstart->pArticle->price) {
+        temp = bstart->pNext;
+        bstart->pNext = astart->pNext;
+        astart->pNext = bstart;
+        bstart = temp;
+      }
+      astart = astart->pNext;
+    }
+    if (astart == aend)
+      astart->pNext = bstart;
+    else
+      *end2 = *end1;
   }
-  if (astart == aend)
-    astart->pNext = bstart;
-  else
-    *end2 = *end1;
 }
 
-/* MergeSort of Linked List
-   The gap is initially 1. It is incremented as
-   2, 4, 8, .. until it reaches the length of the
-   linked list. For each gap, the linked list is
-   sorted around the gap.
-   The prevend stores the address of the last node after
-   sorting a part of linked list so that it's next node
-   can be assigned after sorting the succeeding list.
-   temp is used to store the next start1 because after
-   sorting, the last node will be different. So it
-   is necessary to store the address of start1 before
-   sorting. We select the start1, end1, start2, end2 for
-   sorting. start1 - end1 may be considered as a list
-   and start2 - end2 may be considered as another list
-   and we are merging these two sorted list in merge
-   function and assigning the starting address to the
-   previous end address. */
-void mergeSort(ListNode **head) {
+//Daniel S.S.
+void mergeSort(ListNode **head, bool ascending, bool mergedByPrice) {
   if (*head == NULL)
     return;
   ListNode *start1 = NULL, *end1 = NULL;
@@ -202,7 +257,11 @@ void mergeSort(ListNode **head) {
       // To store for next iteration.
       ListNode *temp = end2->pNext;
       // Merging two parts.
-      merge(&start1, &end1, &start2, &end2);
+      if (mergedByPrice) {
+        mergeByPrice(&start1, &end1, &start2, &end2, ascending);
+      } else {
+        mergeByName(&start1, &end1, &start2, &end2, ascending);
+      }
       // Update head for first iteration, else
       // append after previous list
       if (isFirstIter)
@@ -222,8 +281,16 @@ ListNode *execListSortingWizard(ListNode *list) {
   char text[100];
   getInput(text, sizeof(text));
   bool ascending = text[0] == '0' ? true : false;
+  printf("List sorting. Please input\n0\tto sort by price\n1\tto sort by name\n");
+  char textSortBy[100];
+  getInput(textSortBy, sizeof(text));
+  bool mergedByPrice = textSortBy[0] == '0' ? true : false;
+  clock_t startTime = clock();
   ListNode **headRef = &list;
-  mergeSort(headRef);
+  mergeSort(headRef, ascending, mergedByPrice);
+  clock_t endTime = clock();
+  double duration = ((double) endTime - (double) startTime) / (double) CLOCKS_PER_SEC;
+  printf("\nSorting took %.3lf seconds.\n", duration);
   return *headRef;
 }
 
@@ -271,7 +338,7 @@ ListNode *createList(int anzahl) {
   ListNode *pFirst = NULL;
   ListNode *pLast = NULL;
   for (int i = 0; i < anzahl; i++) {
-    // Element erstellen und initialisieren
+    // Create Elements
     pNew = (ListNode *) malloc(sizeof(ListNode));
     if (pNew == NULL) exit(-1);
     pNew->pNext = NULL;
@@ -280,7 +347,7 @@ ListNode *createList(int anzahl) {
     if (pNew->pArticle) {
       pNew->pArticle->price = rand() % 100;
     }
-    // Neues Element an Liste anf�gen
+    // Add Elements to List
     if (pFirst == NULL) pFirst = pNew;
     if (pLast != NULL) pLast->pNext = pNew;
     pLast = pNew;
